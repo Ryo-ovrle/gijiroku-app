@@ -4,3 +4,4 @@ openai-whisper>=20231117
 imageio[ffmpeg]
 numpy
 fpdf2>=2.7.0
+pymupdf>=1.23.0

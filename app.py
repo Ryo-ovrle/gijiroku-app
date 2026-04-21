@@ -67,7 +67,12 @@ def generate_pdf(summary_text, title, date_str):
     return bytes(pdf.output())
 
 def show_pdf(pdf_bytes):
-    pass
+    import fitz
+    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+    for page in doc:
+        pix = page.get_pixmap(dpi=150)
+        img_bytes = pix.tobytes("png")
+        st.image(img_bytes, use_container_width=True)
 
 
 st.set_page_config(page_title="AI議事録メーカー", page_icon="📝", layout="centered")
@@ -290,7 +295,8 @@ if st.session_state.result_text:
 
 if "pdf_bytes" in st.session_state and st.session_state.pdf_bytes:
     st.markdown("---")
-    st.subheader("📄 PDF ダウンロード")
+    st.subheader("📄 PDF プレビュー")
+    show_pdf(st.session_state.pdf_bytes)
     st.download_button(
         label="⬇️ PDFをダウンロード",
         data=st.session_state.pdf_bytes,

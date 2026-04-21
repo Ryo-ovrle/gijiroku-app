@@ -185,6 +185,7 @@ if st.button("🚀 議事録を作成する", type="primary", use_container_widt
 
 # 📋 議事録
 **会議名：** {title_text}
+
 **日付：** {date_text}
 
 ---

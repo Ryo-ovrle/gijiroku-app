@@ -75,14 +75,32 @@ def show_pdf(pdf_bytes):
 
 
 st.set_page_config(page_title="AI議事録メーカー", page_icon="📝", layout="centered")
-st.title("📝 AI議事録メーカー")
-st.success("🔒 音声データはこのPCの中だけで処理されます。外部に送信されません。")
 
+# パスワード認証
 try:
+    correct_password = st.secrets["APP_PASSWORD"]
     api_key = st.secrets["GROQ_API_KEY"]
 except Exception:
-    st.error("APIキーが設定されていません。管理者にお問い合わせください。")
+    st.error("設定が不完全です。管理者にお問い合わせください。")
     st.stop()
+
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    st.title("📝 AI議事録メーカー")
+    st.markdown("---")
+    password_input = st.text_input("パスワードを入力してください", type="password")
+    if st.button("ログイン", use_container_width=True):
+        if password_input == correct_password:
+            st.session_state.authenticated = True
+            st.rerun()
+        else:
+            st.error("パスワードが違います")
+    st.stop()
+
+st.title("📝 AI議事録メーカー")
+st.success("🔒 音声データはこのPCの中だけで処理されます。外部に送信されません。")
 
 with st.sidebar:
     st.header("📌 使い方")

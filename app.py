@@ -325,22 +325,6 @@ if "pdf_bytes" in st.session_state and st.session_state.pdf_bytes:
             except Exception as e:
                 st.error(f"PDFエラー: {e}")
 
-    with col_edit2:
-        if st.button("📱 AirDropで送る準備", use_container_width=True):
-            try:
-                desktop_path = os.path.expanduser(f"~/Desktop/{st.session_state.filename_base}.pdf")
-                with open(desktop_path, "wb") as f:
-                    f.write(st.session_state.pdf_bytes)
-                # FinderでファイルをAirDrop用に選択状態にする
-                subprocess.Popen([
-                    "osascript", "-e",
-                    f'tell application "Finder" to reveal POSIX file "{desktop_path}"'
-                ])
-                subprocess.Popen(["osascript", "-e", 'tell application "Finder" to activate'])
-                st.success(f"デスクトップに保存しました！")
-                st.info("👉 Finderで該当ファイルを右クリック →「共有」→「AirDrop」→ iPhoneを選択")
-            except Exception as e:
-                st.error(f"エラー: {e}")
 
 st.markdown("---")
 st.caption("Powered by Whisper（ローカル処理）+ Groq AI | AI議事録メーカー")

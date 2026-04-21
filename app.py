@@ -69,7 +69,7 @@ def generate_pdf(summary_text, title, date_str):
 def show_pdf(pdf_bytes):
     b64 = base64.b64encode(pdf_bytes).decode()
     st.markdown(
-        f'<iframe src="data:application/pdf;base64,{b64}" width="100%" height="700px" style="border:1px solid #ddd; border-radius:8px;"></iframe>',
+        f'<a href="data:application/pdf;base64,{b64}" target="_blank" style="display:block;text-align:center;padding:20px;background:#1e1e2e;border-radius:8px;color:white;font-size:18px;text-decoration:none;">📄 PDFを新しいタブで開く</a>',
         unsafe_allow_html=True
     )
 

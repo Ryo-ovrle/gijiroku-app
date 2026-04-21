@@ -67,11 +67,7 @@ def generate_pdf(summary_text, title, date_str):
     return bytes(pdf.output())
 
 def show_pdf(pdf_bytes):
-    b64 = base64.b64encode(pdf_bytes).decode()
-    st.markdown(
-        f'<a href="data:application/pdf;base64,{b64}" target="_blank" style="display:block;text-align:center;padding:20px;background:#1e1e2e;border-radius:8px;color:white;font-size:18px;text-decoration:none;">📄 PDFを新しいタブで開く</a>',
-        unsafe_allow_html=True
-    )
+    pass
 
 
 st.set_page_config(page_title="AI議事録メーカー", page_icon="📝", layout="centered")
@@ -293,8 +289,7 @@ if st.session_state.result_text:
 
 if "pdf_bytes" in st.session_state and st.session_state.pdf_bytes:
     st.markdown("---")
-    st.subheader("📄 PDF プレビュー")
-    show_pdf(st.session_state.pdf_bytes)
+    st.subheader("📄 PDF ダウンロード")
     st.download_button(
         label="⬇️ PDFをダウンロード",
         data=st.session_state.pdf_bytes,

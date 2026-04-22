@@ -7,8 +7,10 @@ import tempfile
 import os
 import subprocess
 import base64
+import uuid
 from datetime import datetime
 from fpdf import FPDF
+from supabase import create_client
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FONT_PATH = os.path.join(BASE_DIR, "LINESeedJP_A_TTF_Rg.ttf")
@@ -24,6 +26,10 @@ def load_audio_with_ffmpeg(file_path, sr=16000):
 @st.cache_resource
 def load_whisper_model():
     return whisper.load_model("small")
+
+@st.cache_resource
+def get_supabase():
+    return create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
 
 def generate_pdf(summary_text, title, date_str):
     pdf = FPDF()
@@ -87,6 +93,8 @@ except Exception:
 
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
+if "user_token" not in st.session_state:
+    st.session_state.user_token = str(uuid.uuid4())
 
 if not st.session_state.authenticated:
     st.markdown("""
@@ -129,6 +137,44 @@ with st.sidebar:
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@1,800&display=swap" rel="stylesheet">
     <p style="font-family:'Raleway',sans-serif;font-style:italic;font-weight:800;font-size:1.2rem;letter-spacing:1px;color:#888;">MeetLog</p>
     """, unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.subheader("📬 リクエストボックス")
+    st.caption("欲しい機能・改善要望をどうぞ。いいねで要望に投票できます。")
+
+    try:
+        sb = get_supabase()
+
+        new_req = st.text_input("要望を入力", placeholder="例：話者ごとに色分けしてほしい", key="req_input")
+        if st.button("送信する", use_container_width=True, key="req_submit"):
+            if new_req.strip():
+                sb.table("requests").insert({"content": new_req.strip()}).execute()
+                st.success("送信しました！")
+                st.rerun()
+            else:
+                st.warning("内容を入力してください")
+
+        reqs = sb.table("requests").select("*").order("likes", desc=True).execute()
+        if reqs.data:
+            for req in reqs.data:
+                liked_res = sb.table("likes").select("id").eq("request_id", req["id"]).eq("user_token", st.session_state.user_token).execute()
+                already_liked = len(liked_res.data) > 0
+                c1, c2 = st.columns([5, 1])
+                with c1:
+                    st.write(req["content"])
+                with c2:
+                    label = f"👍{req['likes']}"
+                    if already_liked:
+                        st.button(label, key=f"lk_{req['id']}", disabled=True)
+                    else:
+                        if st.button(label, key=f"lk_{req['id']}"):
+                            sb.table("likes").insert({"request_id": req["id"], "user_token": st.session_state.user_token}).execute()
+                            sb.table("requests").update({"likes": req["likes"] + 1}).eq("id", req["id"]).execute()
+                            st.rerun()
+        else:
+            st.caption("まだリクエストはありません")
+    except Exception as e:
+        st.caption(f"読み込みエラー: {e}")
 
 col1, col2 = st.columns([2, 1])
 with col1:

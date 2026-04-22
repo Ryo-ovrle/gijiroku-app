@@ -5,3 +5,4 @@ imageio[ffmpeg]
 numpy
 fpdf2>=2.7.0
 pymupdf>=1.23.0
+supabase>=2.0.0

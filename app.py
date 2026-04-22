@@ -75,7 +75,7 @@ def show_pdf(pdf_bytes):
         st.image(img_bytes, use_container_width=True)
 
 
-st.set_page_config(page_title="AI議事録メーカー", page_icon="📝", layout="centered")
+st.set_page_config(page_title="MeetLog", page_icon="🎙️", layout="centered")
 
 # パスワード認証
 try:
@@ -89,7 +89,11 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    st.title("📝 AI議事録メーカー")
+    st.markdown("""
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@1,800&display=swap" rel="stylesheet">
+    <h1 style="font-family:'Raleway',sans-serif;font-style:italic;font-weight:800;font-size:3rem;letter-spacing:2px;margin-bottom:0;">🎙️ MeetLog</h1>
+    <p style="color:gray;margin-top:0;">AI議事録 自動生成</p>
+    """, unsafe_allow_html=True)
     st.markdown("---")
     password_input = st.text_input("パスワードを入力してください", type="password")
     if st.button("ログイン", use_container_width=True):
@@ -100,7 +104,11 @@ if not st.session_state.authenticated:
             st.error("パスワードが違います")
     st.stop()
 
-st.title("📝 AI議事録メーカー")
+st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@1,800&display=swap" rel="stylesheet">
+<h1 style="font-family:'Raleway',sans-serif;font-style:italic;font-weight:800;font-size:3rem;letter-spacing:2px;margin-bottom:0;">🎙️ MeetLog</h1>
+<p style="color:gray;margin-top:0;">AI議事録 自動生成</p>
+""", unsafe_allow_html=True)
 st.success("🔒 音声データはこのPCの中だけで処理されます。外部に送信されません。")
 
 with st.sidebar:
@@ -116,6 +124,11 @@ with st.sidebar:
     st.markdown("**🔒 セキュリティ**")
     st.markdown("音声：PC内で処理（外部送信なし）")
     st.markdown("テキスト：要約のみ暗号化通信")
+    st.markdown("---")
+    st.markdown("""
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@1,800&display=swap" rel="stylesheet">
+    <p style="font-family:'Raleway',sans-serif;font-style:italic;font-weight:800;font-size:1.2rem;letter-spacing:1px;color:#888;">MeetLog</p>
+    """, unsafe_allow_html=True)
 
 col1, col2 = st.columns([2, 1])
 with col1:

@@ -95,6 +95,8 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if "user_token" not in st.session_state:
     st.session_state.user_token = str(uuid.uuid4())
+if "view" not in st.session_state:
+    st.session_state.view = "main"
 
 if not st.session_state.authenticated:
     st.markdown("""
@@ -120,12 +122,37 @@ st.markdown("""
 st.success("🔒 音声データはこのPCの中だけで処理されます。外部に送信されません。")
 
 with st.sidebar:
+    st.header("📌 使い方")
+    st.markdown("1. 会議名・日付・固有名詞を入力")
+    st.markdown("2. 音声ファイルをアップロード")
+    st.markdown("3. 議事録を作成ボタンを押す")
+    st.markdown("4. 画面で確認 → PDFでダウンロード")
+    st.markdown("---")
+    st.markdown("**対応形式**")
+    st.markdown("MP3 / MP4 / WAV / M4A / MOV / FLAC")
+    st.markdown("---")
+    st.markdown("**🔒 セキュリティ**")
+    st.markdown("音声：PC内で処理（外部送信なし）")
+    st.markdown("テキスト：要約のみ暗号化通信")
+    st.markdown("---")
+    if st.button("📬 リクエストボックス", use_container_width=True):
+        st.session_state.view = "requests"
+        st.rerun()
+    st.markdown("---")
+    st.markdown("""
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@1,800&display=swap" rel="stylesheet">
+    <p style="font-family:'Raleway',sans-serif;font-style:italic;font-weight:800;font-size:1.2rem;letter-spacing:1px;color:#888;">MeetLog</p>
+    """, unsafe_allow_html=True)
+
+if st.session_state.view == "requests":
     st.subheader("📬 リクエストボックス")
     st.caption("欲しい機能・改善要望をどうぞ。いいねで要望に投票できます。")
-
+    if st.button("← 戻る"):
+        st.session_state.view = "main"
+        st.rerun()
+    st.markdown("---")
     try:
         sb = get_supabase()
-
         new_req = st.text_input("要望を入力", placeholder="例：話者ごとに色分けしてほしい", key="req_input")
         if st.button("送信する", use_container_width=True, key="req_submit"):
             if new_req.strip():
@@ -134,7 +161,7 @@ with st.sidebar:
                 st.rerun()
             else:
                 st.warning("内容を入力してください")
-
+        st.markdown("---")
         reqs = sb.table("requests").select("*").order("likes", desc=True).execute()
         if reqs.data:
             for req in reqs.data:
@@ -153,28 +180,10 @@ with st.sidebar:
                             sb.table("requests").update({"likes": req["likes"] + 1}).eq("id", req["id"]).execute()
                             st.rerun()
         else:
-            st.caption("まだリクエストはありません")
+            st.info("まだリクエストはありません")
     except Exception as e:
-        st.caption(f"読み込みエラー: {e}")
-
-    st.markdown("---")
-    st.header("📌 使い方")
-    st.markdown("1. 会議名・日付・固有名詞を入力")
-    st.markdown("2. 音声ファイルをアップロード")
-    st.markdown("3. 議事録を作成ボタンを押す")
-    st.markdown("4. 画面で確認 → PDFでダウンロード")
-    st.markdown("---")
-    st.markdown("**対応形式**")
-    st.markdown("MP3 / MP4 / WAV / M4A / MOV / FLAC")
-    st.markdown("---")
-    st.markdown("**🔒 セキュリティ**")
-    st.markdown("音声：PC内で処理（外部送信なし）")
-    st.markdown("テキスト：要約のみ暗号化通信")
-    st.markdown("---")
-    st.markdown("""
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@1,800&display=swap" rel="stylesheet">
-    <p style="font-family:'Raleway',sans-serif;font-style:italic;font-weight:800;font-size:1.2rem;letter-spacing:1px;color:#888;">MeetLog</p>
-    """, unsafe_allow_html=True)
+        st.error(f"読み込みエラー: {e}")
+    st.stop()
 
 col1, col2 = st.columns([2, 1])
 with col1:

@@ -8,9 +8,10 @@ import os
 import subprocess
 import base64
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from fpdf import FPDF
 from supabase import create_client
+import extra_streamlit_components as stx
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FONT_PATH = os.path.join(BASE_DIR, "LINESeedJP_A_TTF_Rg.ttf")
@@ -93,10 +94,15 @@ except Exception:
 
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
-if "user_token" not in st.session_state:
-    st.session_state.user_token = str(uuid.uuid4())
 if "view" not in st.session_state:
     st.session_state.view = "main"
+
+cookie_manager = stx.CookieManager()
+user_token = cookie_manager.get("meetlog_uid")
+if not user_token:
+    user_token = str(uuid.uuid4())
+    cookie_manager.set("meetlog_uid", user_token, expires_at=datetime.now() + timedelta(days=3650))
+st.session_state.user_token = user_token
 
 if not st.session_state.authenticated:
     st.markdown("""

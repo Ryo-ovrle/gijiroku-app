@@ -76,6 +76,14 @@ def show_pdf(pdf_bytes):
 
 st.set_page_config(page_title="MeetLog", page_icon="🎙️", layout="centered")
 
+st.markdown("""
+<style>
+header {visibility: hidden;}
+[data-testid="stToolbar"] {display: none !important;}
+.stAppToolbar {display: none !important;}
+</style>
+""", unsafe_allow_html=True)
+
 # パスワード認証
 try:
     correct_password = st.secrets["APP_PASSWORD"]

@@ -185,7 +185,7 @@ if st.button("🚀 議事録を作成する", type="primary", use_container_widt
                 tmp.write(audio_file.read())
                 tmp_path = tmp.name
 
-            with st.spinner("🔒 音声をPC内で文字起こし中...（初回は少し時間がかかります）"):
+            with st.spinner("🔒 音声をPC内で文字起こし中..."):
                 model = load_whisper_model()
                 audio = load_audio_with_ffmpeg(tmp_path)
                 result = model.transcribe(audio, language="ja")
